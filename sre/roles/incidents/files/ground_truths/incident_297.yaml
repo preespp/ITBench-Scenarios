@@ -1,44 +1,47 @@
 ---
 fault:
   - entity:
-      name: otel-cartservice
-      group_id: otel-cartservice
+      name: cart
+      group_id: cart
       kind: Deployment
+    type: custom
+    name: exhaust-node-resources
     condition: Node resource exhaustion
     category: Change
-    fault_mechanism: custom
+    fault_mechanism: exhaust-node-resources
 
 alerts:
-  - id: PendingPodsDetected
-    group_id: otel-cartservice
-    metadata:
-      description: Some pods remain in Pending state due to insufficient CPU/memory on the node
   - id: CPUSpend
-    group_id: otel-demo-cluster
+    group_id: cluster-node-1
     metadata:
       description: Node CPU usage is high due to resource exhaustion
+  - id: RequestLatency
+    group_id: cart
+    metadata:
+      description: Latency of cart deployment increases due to CPU resource contention
 
 groups:
-  - id: otel-cartservice
+  - id: cart
     kind: Deployment
     namespace: otel-demo
     filter:
-      - cartservice.*
+      - cart.*
     root_cause: true
-  - id: otel-demo-cluster
+  - id: cluster-node-1
     kind: Node
     namespace: kube-system
     filter:
       - .*
+
 aliases:
-  - - otel-cartservice
-    - otel-demo-cluster
+  - - cart
+    - cluster-node-1
 
 propagations:
-  - source: otel-demo-cluster
-    target: otel-cartservice
-    condition: Node resource pressure prevents scheduling new pods
-    effect: otel-cartservice pods remain in Pending state
+  - source: cluster-node-1
+    target: cart
+    condition: Node resource pressure prevents new pods from being scheduled
+    effect: Cart deployment pods remain pending and requests may fail
 
 recommended_actions:
   - solution:

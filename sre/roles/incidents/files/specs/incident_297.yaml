@@ -1,7 +1,7 @@
 metadata:
   complexity: Medium
   id: 297
-  name: Node resource exhaustion from load generator pods
+  name: Exhaust Node Resources
   platform: kubernetes
 
 spec:
@@ -9,10 +9,6 @@ spec:
     applications:
       otel_demo:
         enabled: true
-        configuration:
-          load_generator:
-            spawn_rate: 50
-            users: 300
     tools:
       category: sre
       selected:
@@ -20,12 +16,12 @@ spec:
         - grafana
         - jaeger
         - chaos-mesh
+
   faults:
     - custom:
         name: exhaust-node-resources
         exhaust_node_resources:
           workload:
             kind: Deployment
-            name: loadgenerator
+            name: cart
             namespace: "{{ applications_helm_releases.otel_demo.namespace }}"
-
