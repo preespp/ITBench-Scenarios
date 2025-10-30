@@ -12,9 +12,9 @@ fault:
 
 alerts:
   - id: CPUSpend
-    group_id: cluster-node-1
+    group_id: cart
     metadata:
-      description: Node CPU usage is high due to resource exhaustion
+      description: Cart pod CPU usage is high due to StressChaos injection
   - id: RequestLatency
     group_id: cart
     metadata:
@@ -27,25 +27,15 @@ groups:
     filter:
       - cart.*
     root_cause: true
-  - id: cluster-node-1
-    kind: Node
-    namespace: kube-system
-    filter:
-      - .*
 
 aliases:
   - - cart
-    - cluster-node-1
 
-propagations:
-  - source: cluster-node-1
-    target: cart
-    condition: Node resource pressure prevents new pods from being scheduled
-    effect: Cart deployment pods remain pending and requests may fail
+propagations: []
 
 recommended_actions:
   - solution:
-      id: rebalance_or_scale
+      id: tune_resources
       actions:
-        - Rebalance workloads to another node
-        - Scale up cluster node capacity
+        - Increase CPU/memory requests for cart deployment
+        - Use autoscaling or reduce workload concurrency

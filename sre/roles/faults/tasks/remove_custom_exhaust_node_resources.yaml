@@ -1,26 +1,29 @@
 ---
-- name: Get nodes labeled as target for resource hog
+- name: Retrieve StressChaos objects for target workload
   kubernetes.core.k8s_info:
     kubeconfig: "{{ faults_cluster.kubeconfig }}"
-    kind: Node
+    api_version: chaos-mesh.org/v1alpha1
+    kind: StressChaos
+    namespace: "{{ spec.workload.namespace }}"
     label_selectors:
-      - node-role.kubernetes.io/app=true
-  register: node_list
+      - app.kubernetes.io/name={{ spec.workload.name }}
+  register: stress_chaos_list
 
-- name: Select the node labeled for this fault
-  set_fact:
-    target_node: "{{ (node_list.resources | list)[0].metadata.name }}"
-  when: node_list.resources | list | length > 0
-
-- name: Remove node label from target node
+- name: Remove StressChaos CRs related to this workload
   kubernetes.core.k8s:
     kubeconfig: "{{ faults_cluster.kubeconfig }}"
-    resource_definition:
-      apiVersion: v1
-      kind: Node
-      metadata:
-        name: "{{ target_node }}"
-        labels:
-          node-role.kubernetes.io/app: null
-    state: present
-  when: target_node is defined
+    state: absent
+    api_version: chaos-mesh.org/v1alpha1
+    kind: StressChaos
+    name: "{{ item.metadata.name }}"
+    namespace: "{{ spec.workload.namespace }}"
+  loop: "{{ stress_chaos_list.resources }}"
+  when: stress_chaos_list.resources | length > 0
+
+- name: Confirm StressChaos removal
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ faults_cluster.kubeconfig }}"
+    api_version: chaos-mesh.org/v1alpha1
+    kind: StressChaos
+    namespace: "{{ spec.workload.namespace }}"
+  register: stress_chaos_post_delete

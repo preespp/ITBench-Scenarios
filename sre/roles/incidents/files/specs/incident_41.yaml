@@ -1,6 +1,6 @@
 metadata:
   complexity: Medium
-  id: 297
+  id: 41
   name: Exhaust Node Resources
   platform: kubernetes
 
@@ -25,3 +25,5 @@ spec:
             kind: Deployment
             name: cart
             namespace: "{{ applications_helm_releases.otel_demo.namespace }}"
+            container: 
+              name: cart

@@ -346,6 +346,9 @@ argument_specs:
                       namespace:
                         required: true
                         type: str
+                      container:
+                        required: true
+                        type: str
           otel_demo:
             required: false
             type: dict

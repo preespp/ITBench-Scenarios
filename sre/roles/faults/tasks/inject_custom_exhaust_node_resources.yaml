@@ -1,51 +1,49 @@
 ---
-- name: Get pods for target workload
-  kubernetes.core.k8s_info:
-    kubeconfig: "{{ faults_cluster.kubeconfig }}"
-    kind: Pod
-    namespace: "{{ spec.workload.namespace }}"
-    label_selectors:
-      - app.kubernetes.io/name={{ spec.workload.name }}
-  register: workload_pods
+- name: Import variable setting tasks
+  ansible.builtin.import_tasks:
+    file: set_faults_workload_container_index.yaml
+  vars:
+    faults_workload: "{{ spec.workload }}"
 
-- name: Select node hosting target workload
-  set_fact:
-    target_node: "{{ workload_pods.resources[0].spec.nodeName }}"
-
-- name: Label the node as target for resource hog
+- name: Inject CPU and Memory stress using Chaos Mesh
   kubernetes.core.k8s:
     kubeconfig: "{{ faults_cluster.kubeconfig }}"
     resource_definition:
-      apiVersion: v1
-      kind: Node
+      apiVersion: chaos-mesh.org/v1alpha1
+      kind: StressChaos
       metadata:
-        name: "{{ target_node }}"
-        labels:
-          node-role.kubernetes.io/app: "true"
-    state: present
-
-- name: Deploy resource hog on target node
-  kubernetes.core.k8s:
-    kubeconfig: "{{ faults_cluster.kubeconfig }}"
-    resource_definition:
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: fake-resource-hog
+        name: stress-chaos-{{ spec.workload.name }}
         namespace: "{{ spec.workload.namespace }}"
       spec:
-        replicas: 1
+        mode: one
         selector:
-          matchLabels:
-            app: fake-resource-hog
-        template:
-          metadata:
-            labels:
-              app: fake-resource-hog
-          spec:
-            nodeSelector:
-              node-role.kubernetes.io/app: "true"
-            containers:
-              - name: stress-container
-                image: progrium/stress
-                args: ["--cpu", "8", "--io", "4", "--vm", "2", "--vm-bytes", "512M"]
+          namespaces:
+            - "{{ spec.workload.namespace }}"
+          labelSelectors:
+            app.kubernetes.io/name: "{{ spec.workload.name }}"
+        stressors:
+          cpu:
+            workers: 4
+          memory:
+            workers: 1
+            size: "256MB"
+        duration: "60s"
+        scheduler:
+          cron: "@once"
+
+- name: Confirm stress chaos created
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ faults_cluster.kubeconfig }}"
+    api_version: chaos-mesh.org/v1alpha1
+    kind: StressChaos
+    namespace: "{{ spec.workload.namespace }}"
+    name: "stress-chaos-{{ spec.workload.name }}"
+  register: stress_chaos_info
+
+- name: Import workload restart tasks
+  ansible.builtin.import_tasks:
+    file: force_workload_restart.yaml
+  when:
+    - (spec.workload.restart_policy | default('force')) == 'force'
+  vars:
+    faults_workload: "{{ spec.workload }}"
