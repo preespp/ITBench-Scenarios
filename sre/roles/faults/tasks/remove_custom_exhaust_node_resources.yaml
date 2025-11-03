@@ -7,7 +7,7 @@
     namespace: "{{ spec.workload.namespace }}"
     label_selectors:
       - app.kubernetes.io/name={{ spec.workload.name }}
-  register: stress_chaos_list
+  register: faults_stress_chaos_list
 
 - name: Remove StressChaos CRs related to this workload
   kubernetes.core.k8s:
@@ -17,8 +17,8 @@
     kind: StressChaos
     name: "{{ item.metadata.name }}"
     namespace: "{{ spec.workload.namespace }}"
-  loop: "{{ stress_chaos_list.resources }}"
-  when: stress_chaos_list.resources | length > 0
+  loop: "{{ faults_stress_chaos_list.resources }}"
+  when: faults_stress_chaos_list.resources | length > 0
 
 - name: Confirm StressChaos removal
   kubernetes.core.k8s_info:
@@ -26,4 +26,4 @@
     api_version: chaos-mesh.org/v1alpha1
     kind: StressChaos
     namespace: "{{ spec.workload.namespace }}"
-  register: stress_chaos_post_delete
+  register: faults_stress_chaos_post_delete

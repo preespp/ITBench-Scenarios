@@ -38,7 +38,7 @@
     kind: StressChaos
     namespace: "{{ spec.workload.namespace }}"
     name: "stress-chaos-{{ spec.workload.name }}"
-  register: stress_chaos_info
+  register: faults_stress_chaos_info 
 
 - name: Import workload restart tasks
   ansible.builtin.import_tasks:
