@@ -11,10 +11,6 @@ fault:
     fault_mechanism: exhaust-node-resources
 
 alerts:
-  - id: CPUSpend
-    group_id: cart
-    metadata:
-      description: Cart pod CPU usage is high due to StressChaos injection
   - id: RequestLatency
     group_id: cart
     metadata:
