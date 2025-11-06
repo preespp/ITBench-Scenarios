@@ -4,12 +4,13 @@ __Note: The following setup guide has been verified and tested on MacOS using th
 
 _Note: The following setup guide presumes that the required software listed [here](./README.md#required-software) has been installed. If it has not, please go back and do so before following this document._
 
+_Note: Please review the [hardware requirements](../../docs/hardware_specification.md) to ensure that the machine matches or exceeds the specifications._
+
 ## Recommended Software
 
 1. [Podman](https://podman.io/)
 2. [Golang - v1.24 and above](https://go.dev/)
 2. [Kind](https://kind.sigs.k8s.io/)
-3. [Cloud Provider Kind](https://github.com/kubernetes-sigs/cloud-provider-kind)
 
 ### Installing Recommended Software via Homebrew (MacOS)
 
@@ -25,9 +26,9 @@ brew install go
 podman machine init
 ```
 
-2. Set the machine's resources. The tested configuration uses 12 CPU cores and 16 GB of RAM.
+2. Set the machine's resources.
 ```shell
-podman machine set --cpus 12 -m 16384
+podman machine set --cpus 8 -m 16384
 ```
 
 3. Start the Machine
@@ -37,17 +38,12 @@ podman machine start
 
 4. Create a kind cluster. A barebone kind configuration file has been provided [here](./kind-config.yaml).
 ```shell
-make create_cluster
+make create_single_node_cluster
 ```
 
-_Note: To delete the cluster, run this command: `make delete_cluster`_
+_Note: To delete the cluster, run this command: `make destory_cluster`_
 
-5. Once the cluster is running, we need to run the `cloud-provider-kind` in a *second* terminal and keep it running.
-```shell
-make start_provider
-```
-
-6. Update the value of the `kubeconfig` key in the `../../group_vars/environment/cluster.yaml`, with the absolute path to the kubeconfig (located at `$HOME/.kube/config`).
+5. Update the value of the `kubeconfig` key in the `../../group_vars/environment/cluster.yaml`, with the absolute path to the kubeconfig (located at `$HOME/.kube/config`).
 ```shell
 vim ../../group_vars/environment/cluster.yaml
 ```
@@ -57,4 +53,4 @@ cluster:
   kubeconfig: "<path to kubeconfig>"
 ```
 
-7. The cluster has been set up. Now let's head back to the [parent README](../../README.md#running-incident-scenarios---quick-start) to deploy the incidents.
+6. The cluster has been set up. Now let's head back to the [parent README](../../README.md#running-incident-scenarios---quick-start) to deploy the incidents.

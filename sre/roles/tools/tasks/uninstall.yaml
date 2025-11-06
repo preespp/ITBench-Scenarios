@@ -16,6 +16,14 @@
     - tools_required.kubernetes_metrics_server
     - tools_cluster.platform == "kubernetes"
 
+- name: Import Istio uninstallation tasks
+  ansible.builtin.import_tasks:
+    file: uninstall_istio.yaml
+  vars:
+    helm_release: "{{ tools_helm_releases.istio.components }}"
+  when:
+    - tools_required.istio
+
 - name: Import Chaos Mesh uninstallation tasks
   ansible.builtin.import_tasks:
     file: uninstall_chaos_mesh.yaml
@@ -35,10 +43,6 @@
 - name: Import OpenTelemetry uninstallation tasks
   ansible.builtin.import_tasks:
     file: uninstall_opentelemetry.yaml
-  vars:
-    helm_releases:
-      collectors: "{{ tools_helm_releases.opentelemetry_collectors }}"
-      operator: "{{ tools_helm_releases.opentelemetry_operator }}"
   when:
     - tools_required.jaeger or tools_required.opentelemetry
 
