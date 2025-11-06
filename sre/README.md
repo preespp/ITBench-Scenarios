@@ -1,17 +1,20 @@
 # ITBench for Site Reliability Engineering (SRE) and Financial Operations (FinOps)
 
-**[Paper](https://github.com/IBM/ITBench/blob/main/it_bench_arxiv.pdf) | [Incident Scenarios](./docs/incident_scenarios.md) | [Tools](./docs/tools.md)**
+**[Paper](https://github.com/IBM/ITBench/blob/main/it_bench_arxiv.pdf) | [Incident Scenarios](./docs/incidents.md) | [Tools](./docs/tools.md)**
 
 ## Overview
 ITBench uses open source technologies to create completely repeatable and reproducible scenarios on a Kubernetes platform. A SRE scenario involves deploying a set of observability tools, a sample application, and triggering an incident (referred to as task) in the environment.
 
-![itbench_sre_task_scenario.png](./docs/itbench_sre_task_scenario.png)
+![itbench_sre_task_scenario.png](./images/itbench_sre_scenarios_flow.png)
+
 While this repository focuses on scenarios, an open-source Language Model (LM)-based SRE-Agent that aims to diagnose and remediate issues in these scenario environments can be found [here](https://github.com/IBM/ITBench-SRE-Agent).
 
 ### Structure
+This project uses [Ansible](https://docs.ansible.com/ansible/latest/getting_started/introduction.html) to automate the deployment and undeployment of technologies to a Kubernetes cluster and the injection and removal of faults.
 
-This project uses Ansible to automate the deployment and undeployment of technologies to a Kubernetes cluster and the injection and removal of faults.
-The playbook run is configured using variables defined in `group\_vars`.
+For those new to Ansible, consider checking out the [documentation](https://docs.ansible.com/ansible/latest/playbook_guide/index.html) for guides and advices.
+
+The playbook run is configured using variables defined in `group_vars`.
 
 | Directory                   | Purpose                                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------------------------------|
@@ -168,9 +171,9 @@ make help
 
 ### Images are not downloading from DockerHub
 
-A few of the tools and applications used by the various software in ITBench requires downloading images from DockerHub. However, DockerHub has [rate limits](https://docs.docker.com/docker-hub/usage/) which will prevent an user from pulling from it after the limit has been exhuasted for that IP address until it resets.
+A few of the tools and applications used by the various software in ITBench requires downloading images from DockerHub. However, DockerHub has [rate limits](https://docs.docker.com/docker-hub/usage/) which will prevent an user from pulling from it after the limit has been exhausted for that IP address until it resets.
 
-One recommended approach for manuevering around this limit is to creating a Personal Access Token (PAT) and then using it as a secret in Kubernetes.
+One recommended approach for maneuvering around this limit is to creating a Personal Access Token (PAT) and then using it as a secret in Kubernetes.
 Steps are as follows:
 1. **Login/Create a Docker Hub account** at https://www.docker.com/get-started/
 2. **Generate a Personal Access Token (PAT)**:

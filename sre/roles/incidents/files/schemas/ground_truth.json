@@ -1,7 +1,17 @@
 {
     "type": "object",
-    "required": ["alerts", "aliases", "fault", "groups", "recommended_actions"],
+    "required": ["metadata", "alerts", "fault", "groups", "recommended_actions"],
     "properties": {
+        "metadata": {
+            "type": "object",
+            "required": ["version"],
+            "properties": {
+                "version": {
+                    "type": "string",
+                    "enum": ["v1"]
+                }
+            }
+        },
         "alerts": {
             "type": "array",
             "minItems": 1,
@@ -14,7 +24,7 @@
                     },
                     "id": {
                         "type": "string",
-                        "enum": ["CPUSpend", "MemorySpend", "NoRequestsDetected", "PendingPodsDetected", "PodCrashLoopBackOff", "RequestErrorRate", "RequestLatency"]
+                        "enum": ["CPUSpend", "MemorySpend", "NoRequestsDetected", "FailedPodsDetected", "PendingPodsDetected", "PodCrashLoopBackOff", "RequestErrorRate", "RequestLatency", "KafkaConnectionClosureRate"]
                     },
                     "metadata": {
                         "type": "object",
