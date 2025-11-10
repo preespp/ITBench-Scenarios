@@ -6,7 +6,7 @@
     kind: Deployment
     name: "{{ spec.workload.name }}"
     namespace: "{{ spec.workload.namespace }}"
-  register: existing_deployment
+  register: faults_existing_deployment
 
 - name: Inject fault (init container hang)
   kubernetes.core.k8s:

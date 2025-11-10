@@ -6,7 +6,7 @@
     kind: Deployment
     name: "{{ spec.workload.name }}"
     namespace: "{{ spec.workload.namespace }}"
-  register: existing_deployment
+  register: faults_existing_deployment
 
 - name: Remove the hanging init container
   kubernetes.core.k8s_json_patch:
