@@ -1,0 +1,27 @@
+---
+metadata:
+  version: "v1"
+scenario:
+  metadata:
+    complexity: Low
+    id: 107
+    name: Init-Container Hang
+    platform: kubernetes
+  spec:
+    environment:
+      applications:
+        otel_demo:
+          enabled: true
+      tools:
+        category: sre
+        selected:
+          - kubernetes-topology-monitor
+    faults:
+      - custom:
+          name: init-container-hang
+          init_container_hang:
+            workload:
+              kind: Deployment
+              name: email
+              namespace: "{{ applications_helm_releases.otel_demo.namespace }}"
+            restart_policy: force
