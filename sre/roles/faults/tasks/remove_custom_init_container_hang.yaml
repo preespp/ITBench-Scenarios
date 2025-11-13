@@ -1,30 +1,4 @@
 ---
-- name: Retrieve existing Deployment
-  kubernetes.core.k8s_info:
-    kubeconfig: "{{ faults_cluster.kubeconfig }}"
-    api_version: apps/v1
-    kind: Deployment
-    name: "{{ spec.workload.name }}"
-    namespace: "{{ spec.workload.namespace }}"
-  register: faults_existing_deployment
-
-- name: Remove the hanging init container
-  kubernetes.core.k8s_json_patch:
-    api_version: apps/v1
-    kind: Deployment
-    kubeconfig: "{{ faults_cluster.kubeconfig }}"
-    name: "{{ spec.workload.name }}"
-    namespace: "{{ spec.workload.namespace }}"
-    patch:
-      - op: remove
-        path: /spec/template/spec/initContainers/0
-  when:
-    - existing_deployment.resources | length > 0
-    - existing_deployment.resources[0].spec.template.spec.initContainers | length > 0
-
-- name: Restart pods if restart_policy is force
-  ansible.builtin.import_tasks:
-    file: force_workload_restart.yaml
-  when: (spec.workload.restart_policy | default('force')) == 'force'
-  vars:
-    faults_workload: "{{ spec.workload }}"
+- name: Display fault removal instructions
+  ansible.builtin.debug:
+    msg: To remove this fault, please uninstall and reinstall the application it was injected into.
