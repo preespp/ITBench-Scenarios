@@ -1,29 +1,29 @@
 ---
-- name: Retrieve StressChaos objects for target workload
+- name: Retrieve Chaos Mesh Schedule objects for target workload
   kubernetes.core.k8s_info:
     kubeconfig: "{{ faults_cluster.kubeconfig }}"
     api_version: chaos-mesh.org/v1alpha1
-    kind: StressChaos
+    kind: Schedule
     namespace: "{{ spec.workload.namespace }}"
     label_selectors:
       - app.kubernetes.io/name={{ spec.workload.name }}
-  register: faults_stress_chaos_list
+  register: faults_schedule_list
 
-- name: Remove StressChaos CRs related to this workload
+- name: Remove Chaos Mesh Schedule CRs related to this workload
   kubernetes.core.k8s:
     kubeconfig: "{{ faults_cluster.kubeconfig }}"
     state: absent
     api_version: chaos-mesh.org/v1alpha1
-    kind: StressChaos
+    kind: Schedule
     name: "{{ item.metadata.name }}"
     namespace: "{{ spec.workload.namespace }}"
-  loop: "{{ faults_stress_chaos_list.resources }}"
-  when: faults_stress_chaos_list.resources | length > 0
+  loop: "{{ faults_schedule_list.resources }}"
+  when: faults_schedule_list.resources | length > 0
 
-- name: Confirm StressChaos removal
+- name: Confirm Chaos Mesh Schedule removal
   kubernetes.core.k8s_info:
     kubeconfig: "{{ faults_cluster.kubeconfig }}"
     api_version: chaos-mesh.org/v1alpha1
-    kind: StressChaos
+    kind: Schedule
     namespace: "{{ spec.workload.namespace }}"
-  register: faults_stress_chaos_post_delete
+  register: faults_schedule_post_delete

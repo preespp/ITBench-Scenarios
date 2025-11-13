@@ -5,45 +5,39 @@
   vars:
     faults_workload: "{{ spec.workload }}"
 
-- name: Inject CPU and Memory stress using Chaos Mesh
+- name: Inject resource-limit-removal via Chaos Mesh schedule
   kubernetes.core.k8s:
     kubeconfig: "{{ faults_cluster.kubeconfig }}"
     resource_definition:
       apiVersion: chaos-mesh.org/v1alpha1
-      kind: StressChaos
+      kind: Schedule
       metadata:
-        name: stress-chaos-{{ spec.workload.name }}
+        name: remove-limits-{{ spec.workload.name }}
         namespace: "{{ spec.workload.namespace }}"
       spec:
-        mode: one
-        selector:
-          namespaces:
-            - "{{ spec.workload.namespace }}"
-          labelSelectors:
-            app.kubernetes.io/name: "{{ spec.workload.name }}"
-        stressors:
-          cpu:
-            workers: 4
-          memory:
-            workers: 1
-            size: "256MB"
-        duration: "60s"
-        scheduler:
-          cron: "@once"
+        schedule: "@once"
+        historyLimit: 1
+        concurrencyPolicy: Forbid
+        type: PodChaos
+        podChaos:
+          action: patch
+          mode: one
+          selector:
+            namespaces:
+              - "{{ spec.workload.namespace }}"
+            labelSelectors:
+              app.kubernetes.io/name: "{{ spec.workload.name }}"
+          patch:
+            containers:
+              - name: "{{ spec.workload.container.name }}"
+                resources:
+                  limits: {}
 
-- name: Confirm stress chaos created
+- name: Confirm Chaos Mesh schedule created
   kubernetes.core.k8s_info:
     kubeconfig: "{{ faults_cluster.kubeconfig }}"
     api_version: chaos-mesh.org/v1alpha1
-    kind: StressChaos
+    kind: Schedule
     namespace: "{{ spec.workload.namespace }}"
-    name: "stress-chaos-{{ spec.workload.name }}"
-  register: faults_stress_chaos_info
-
-- name: Import workload restart tasks
-  ansible.builtin.import_tasks:
-    file: force_workload_restart.yaml
-  when:
-    - (spec.workload.restart_policy | default('force')) == 'force'
-  vars:
-    faults_workload: "{{ spec.workload }}"
+    name: "remove-limits-{{ spec.workload.name }}"
+  register: faults_schedule_info

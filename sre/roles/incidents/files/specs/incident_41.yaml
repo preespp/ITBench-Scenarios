@@ -21,12 +21,24 @@ scenario:
           - chaos-mesh
 
     faults:
-      - custom:
-          name: exhaust-node-resources
-          exhaust_node_resources:
-            workload:
-              kind: Deployment
-              name: cart
-              namespace: "{{ applications_helm_releases.otel_demo.namespace }}"
-              container:
-                name: cart
+      - chaos_mesh:
+          schedule:
+            name: remove-limits-cart
+            spec:
+              schedule: "@once"
+              historyLimit: 1
+              concurrencyPolicy: Forbid
+              type: PodChaos
+              podChaos:
+                action: patch
+                mode: one
+                selector:
+                  namespaces:
+                    - "{{ applications_helm_releases.otel_demo.namespace }}"
+                  labelSelectors:
+                    app.kubernetes.io/name: "cart"
+                patch:
+                  containers:
+                    - name: cart
+                      resources:
+                        limits: {}
