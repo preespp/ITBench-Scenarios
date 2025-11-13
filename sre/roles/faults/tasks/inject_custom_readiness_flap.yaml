@@ -25,10 +25,10 @@
     kind: Deployment
     namespace: "{{ spec.workload.namespace }}"
     name: "{{ spec.workload.name }}"
-  register: readiness_flap_rollout
+  register: faults_readiness_flap_rollout
   retries: 10
   delay: 3
-  until: readiness_flap_rollout.resources | length > 0
+  until: faults_readiness_flap_rollout.resources | length > 0
 
 - name: Display readiness-flap injection summary
   ansible.builtin.debug:
