@@ -41,7 +41,7 @@ argument_specs:
             options:
               name:
                 choices:
-                  - init-container-hang
+                  - hang-init-container
                   - invalid-command
                   - invalid-image
                   - invalid-node-selector
@@ -55,7 +55,7 @@ argument_specs:
                   - pod-anti-affinity-rescheduling
                 required: true
                 type: str
-              init_container_hang:
+              hang_init_container:
                 required: false
                 type: dict
                 options:

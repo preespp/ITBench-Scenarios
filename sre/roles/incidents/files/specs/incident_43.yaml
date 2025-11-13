@@ -4,7 +4,7 @@ metadata:
 scenario:
   metadata:
     complexity: Low
-    id: 107
+    id: 43
     name: Init-Container Hang
     platform: kubernetes
   spec:
@@ -18,8 +18,8 @@ scenario:
           - kubernetes-topology-monitor
     faults:
       - custom:
-          name: init-container-hang
-          init_container_hang:
+          name: hang-init-container
+          hang_init_container:
             workload:
               kind: Deployment
               name: email

@@ -8,6 +8,14 @@
     namespace: "{{ spec.workload.namespace }}"
   register: faults_existing_deployment
 
+- name: Combine existing init containers (if any) with the new hang container
+  set_fact:
+    updated_init_containers: >-
+      {{
+        (faults_existing_deployment.resources[0].spec.template.spec.initContainers | default([]))
+        + [ { 'name': 'hang-init', 'image': 'busybox', 'command': ['sh', '-c', 'sleep 300'] } ]
+      }}
+
 - name: Inject fault (init container hang)
   kubernetes.core.k8s:
     kubeconfig: "{{ faults_cluster.kubeconfig }}"
@@ -21,10 +29,7 @@
       spec:
         template:
           spec:
-            initContainers:
-              - name: hang-init
-                image: busybox
-                command: ["sh", "-c", "sleep infinity"]
+            initContainers: "{{ updated_init_containers }}"
 
 - name: Restart pods if restart_policy is force
   ansible.builtin.import_tasks:
