@@ -22,6 +22,11 @@ alerts:
     group_id: frontend
     metadata:
       description: Latency spikes observed in frontend service due to pod churn.
+  - id: RequestLatency
+    group_id: cart-service-1
+    metadata:
+      description: Increased latency in cart-service due to upstream frontend-service timeouts.
+
 groups:
   - id: frontend
     kind: Deployment
@@ -31,22 +36,21 @@ groups:
     kind: Service
     namespace: default
     root_cause: false
-  - id: cartservice
+  - id: cart-service-1
     kind: Deployment
     namespace: default
     root_cause: false
 aliases:
   - - frontend
     - frontend-service
-  - - cartservice
-    - redis-cart
+  - - cart-service-1
 propagations:
   - source: frontend
     target: frontend-service
     condition: Readiness probe failing
     effect: Service temporarily loses endpoints
   - source: frontend-service
-    target: cartservice
+    target: cart-service-1
     condition: Upstream request timeouts
     effect: Cascading latency and retry storms
 recommended_actions:

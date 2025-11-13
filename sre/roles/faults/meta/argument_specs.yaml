@@ -338,7 +338,7 @@ argument_specs:
                     options:
                       flap_interval_seconds:
                         required: false
-                        default: 10
+                        default: 4
                         type: int
                       failure_threshold:
                         required: false
@@ -350,7 +350,7 @@ argument_specs:
                         type: int
                       period_seconds:
                         required: false
-                        default: 3
+                        default: 1
                         type: int
                   chaos_mesh:
                     required: false
@@ -358,11 +358,11 @@ argument_specs:
                     options:
                       latency_ms:
                         required: false
-                        default: 500
+                        default: 1000
                         type: int
                       drop_probability:
                         required: false
-                        default: 0.3
+                        default: 0.7
                         type: float
                   restart_policy:
                     choices:

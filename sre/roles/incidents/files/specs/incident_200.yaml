@@ -35,6 +35,6 @@ scenario:
               success_threshold: 1
               period_seconds: 2
             chaos_mesh:
-              latency_ms: 600
-              drop_probability: 0.4
+              latency_ms: 1000
+              drop_probability: 0.7
             restart_policy: force
