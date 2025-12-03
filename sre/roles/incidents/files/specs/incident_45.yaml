@@ -4,7 +4,7 @@ metadata:
 scenario:
   metadata:
     complexity: Low
-    id: 43
+    id: 45
     name: Init-Container Hang
     platform: kubernetes
   spec:
