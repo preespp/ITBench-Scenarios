@@ -102,7 +102,7 @@
   ansible.builtin.import_tasks:
     file: inject_custom_init_container_hang.yaml
   vars:
-    spec: "{{ fault.custom.init_container_hang }}"
+    spec: "{{ fault.custom.hang_init_container }}"
   when:
-    - fault.custom.name == 'init-container-hang'
-    - fault.custom.init_container_hang is defined
+    - fault.custom.name == 'hang-init-container'
+    - fault.custom.hang_init_container is defined
