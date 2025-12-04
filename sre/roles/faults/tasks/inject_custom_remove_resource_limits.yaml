@@ -1,0 +1,17 @@
+---
+- name: Remove resource limits from workload container
+  kubernetes.core.k8s:
+    kubeconfig: "{{ faults_cluster.kubeconfig }}"
+    resource_definition:
+      apiVersion: apps/v1
+      kind: "{{ spec.workload.kind }}"
+      metadata:
+        name: "{{ spec.workload.name }}"
+        namespace: "{{ spec.workload.namespace }}"
+      spec:
+        template:
+          spec:
+            containers:
+              - name: "{{ spec.workload.container.name }}"
+                resources: {}
+    state: present

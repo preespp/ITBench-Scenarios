@@ -1,0 +1,52 @@
+---
+metadata:
+  version: "v1"
+fault:
+  - entity:
+      name: remove-resource-limits-cart
+      group_id: cart
+      kind: Deployment
+    name: exhaust-node-resources
+    condition: Node resource exhaustion via removed CPU/memory limits
+    category: Chaos
+    fault_mechanism: custom
+
+alerts:
+  - id: RequestErrorRate
+    group_id: cart
+    metadata:
+      description: Some requests to the cart service fail due to pod failures from Chaos Mesh pod-failure and removed resource limits.
+  - id: CrashLoopBackOffPodsDetected
+    group_id: cart
+    metadata:
+      description: Cart pods enter CrashLoopBackOff due to repeated pod failures and missing resource limits
+
+groups:
+  - id: remove-resource-limits-cart
+    kind: Deployment
+    filter:
+      - "^cart$"
+    namespace: otel-demo
+    root_cause: true
+  - id: cart
+    kind: Deployment
+    filter:
+      - "^cart.*"
+    namespace: otel-demo
+
+aliases:
+  - - cart
+
+propagations:
+  - source: remove-resource-limits-cart
+    target: cart
+    condition: Removing CPU/memory limits allows pods to consume more resources, potentially causing node exhaustion
+    effect: Latency may increase
+
+recommended_actions:
+  - solution:
+      id: tune_resources
+      actions:
+        - Restore CPU/memory limits
+        - Increase requests/limits as needed
+        - Consider autoscaling
