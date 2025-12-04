@@ -52,10 +52,64 @@ argument_specs:
                   - modify-environment-variables
                   - readiness-flap
                   - unsupported-image
-                  - expired-tls-certificates
                   - disable-ambient-mode
-                required: true
-                type: str
+                  - remove-resource-limits
+                  - pod-anti-affinity-rescheduling
+                  - misconfigured-resource-limits
+                  - authorization-policy-deny
+                  - hang-init-container
+              authorization_policy_deny:
+                required: false
+                type: dict
+                options:
+                  gateway:
+                    required: false
+                    type: dict
+                    options:
+                      name:
+                        required: true
+                        type: str
+                      namespace:
+                        required: true
+                        type: str
+                  methods:
+                    required: true
+                    elements: str
+                    type: list
+              hang_init_container:
+                required: false
+                type: dict
+                options:
+                  workload:
+                    required: true
+                    type: dict
+                    options:
+                      container:
+                        required: true
+                        type: dict
+                        options:
+                          name:
+                            required: false
+                            type: str
+                      kind:
+                        choices:
+                          - Deployment
+                          - StatefulSet
+                        required: true
+                        type: str
+                      name:
+                        required: true
+                        type: str
+                      namespace:
+                        required: true
+                        type: str
+                  restart_policy:
+                    choices:
+                      - force
+                      - safe
+                    default: force
+                    required: false
+                    type: str
               disable_ambient_mode:
                 required: false
                 type: dict
@@ -332,38 +386,6 @@ argument_specs:
                           name:
                             required: false
                             type: str
-                  probe_config:
-                    required: false
-                    type: dict
-                    options:
-                      flap_interval_seconds:
-                        required: false
-                        default: 4
-                        type: int
-                      failure_threshold:
-                        required: false
-                        default: 1
-                        type: int
-                      success_threshold:
-                        required: false
-                        default: 1
-                        type: int
-                      period_seconds:
-                        required: false
-                        default: 1
-                        type: int
-                  chaos_mesh:
-                    required: false
-                    type: dict
-                    options:
-                      latency_ms:
-                        required: false
-                        default: 1000
-                        type: int
-                      drop_probability:
-                        required: false
-                        default: 0.7
-                        type: float
                   restart_policy:
                     choices:
                       - force
@@ -405,42 +427,6 @@ argument_specs:
                     default: force
                     required: false
                     type: str
-              expired_tls_certificates:
-                required: false
-                type: dict
-                options:
-                  istio_namespace:
-                    default: istio-system
-                    required: false
-                    type: str
-                  cert_ttl:
-                    default: 1m
-                    required: false
-                    type: str
-                  max_cert_ttl:
-                    default: 2m
-                    required: false
-                    type: str
-                  grace_period:
-                    default: 30s
-                    required: false
-                    type: str
-              misconfigured_service_mesh:
-                required: false
-                type: dict
-                options:
-                  misconfiguration_type:
-                    choices:
-                      - sidecar_injection_off
-                    required: true
-                    type: str
-                  sidecar_injection_off:
-                    required: false
-                    type: dict
-                    options:
-                      namespace:
-                        required: true
-                        type: str
           otel_demo:
             required: false
             type: dict
