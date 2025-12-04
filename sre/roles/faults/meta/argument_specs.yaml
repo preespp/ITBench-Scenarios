@@ -425,7 +425,7 @@ argument_specs:
                         type: str
                       container:
                         required: true
-                        type: raw
+                        type: str
               pod_anti_affinity_rescheduling:
                 required: false
                 type: dict

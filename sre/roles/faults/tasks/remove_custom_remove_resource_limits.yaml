@@ -1,23 +1,4 @@
 ---
-- name: Restore resource limits on workload container
-  kubernetes.core.k8s:
-    kubeconfig: "{{ faults_cluster.kubeconfig }}"
-    resource_definition:
-      apiVersion: apps/v1
-      kind: "{{ spec.workload.kind }}"
-      metadata:
-        name: "{{ spec.workload.name }}"
-        namespace: "{{ spec.workload.namespace }}"
-      spec:
-        template:
-          spec:
-            containers:
-              - name: "{{ spec.workload.container.name }}"
-                resources:
-                  limits:
-                    cpu: "500m"
-                    memory: "512Mi"
-                  requests:
-                    cpu: "250m"
-                    memory: "256Mi"
-    state: present
+- name: Display fault removal instructions
+  ansible.builtin.debug:
+    msg: To remove this fault, please uninstall and reinstall the application it was injected into.
