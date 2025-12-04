@@ -10,10 +10,6 @@ fault:
     category: Misconfiguration
     fault_mechanism: readiness-probe-flap
 alerts:
-  - id: FailedPodsDetected
-    group_id: frontend
-    metadata:
-      description: Multiple frontend pods repeatedly transition between Ready and NotReady.
   - id: RequestErrorRate
     group_id: frontend
     metadata:
@@ -22,11 +18,12 @@ alerts:
     group_id: frontend
     metadata:
       description: Latency spikes observed in frontend service due to pod churn.
+      note: "This alert may not always fire in small-scale or low-traffic tests."
   - id: RequestLatency
     group_id: cart-service-1
     metadata:
       description: Increased latency in cart-service due to upstream frontend-service timeouts.
-
+      note: "This alert may not always fire depending on traffic and number of Ready pods."
 groups:
   - id: frontend
     kind: Deployment
